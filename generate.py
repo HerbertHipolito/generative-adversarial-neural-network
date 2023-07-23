@@ -7,10 +7,10 @@ import random
 
 def generate_img(selected_numbers,mean,std,img_number,show_img):
     
-    noisy_img = generate_noisy_image(mean,std)
-    noisy_img = np.reshape(noisy_img,(1,794))
-    
     for index in range(img_number):
+    
+        noisy_img = generate_noisy_image(mean,std)
+        noisy_img = np.reshape(noisy_img,(1,794))
         random_number_index = random.randint(0,len(selected_numbers)-1)
         noisy_img[0][784+selected_numbers[random_number_index]] = 1
         generated_img = np.reshape(model(noisy_img)[0][0:784],(28,28))
