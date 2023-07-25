@@ -25,26 +25,25 @@ def save_img(y,title=None,x_label='epoch',y_label='loss',path='./imgs',label=Non
   plt.clf()
   plt.close()
 
-def generate_noisy_image(size=(28,28),mean=0.5,std=0.2):
+def generate_noisy_image(mean=0.5,std=0.2):
 
-  noisy_image = np.zeros(794)
+  noisy_image = np.zeros(784)
 
   for index in range(784):
 
     noisy_image[index] = np.random.normal(mean,std) 
   
-  return np.array(noisy_image)
+  return noisy_image
 
-def oneHotEncodding(target,selected_numbers):
+def oneHotEncodding(target):
   
   new_target = []
 
   for number in target:
     row = [0,0,0,0,0,0,0,0,0,0]
-    if number in selected_numbers:
-      row[number] = 1
-      new_target.append(row)
-  
+    row[number] = 1
+    new_target.append(row)
+
   return new_target
 
 def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
@@ -59,3 +58,13 @@ def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
     feedback = f"No improviment found: {count}"
   
   return smallest_loss, count, True if count >= tries else False, feedback
+
+def divide_dataset(dataset,target,selected_numbers):
+  
+  new_dataset = {}
+  
+  for index,selected_number in enumerate(selected_numbers):
+    
+    new_dataset[index] = [ img for index_img,img in enumerate(dataset) if target[index_img] == selected_number]
+  
+  return new_dataset
