@@ -10,7 +10,7 @@ from sklearn.utils import shuffle
 
 #https://www.tensorflow.org/guide/checkpoint?hl=pt-br
 
-def start_training(x_train,target,epochs,learning_rate,tries):
+def start_training(x_train,epochs,learning_rate,tries):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate), tf.keras.optimizers.Adam(learning_rate=learning_rate)
@@ -23,7 +23,7 @@ def start_training(x_train,target,epochs,learning_rate,tries):
   for epoch in range(epochs):
     print("\nStart of epoch %d" % (epoch,))
     epoch_loss = 0
-#    display_img(np.reshape(noisy_imgs_generated[0][0:784],(28,28)),y_label='epoch:'+str(epoch),title='epoch'+str(epoch)+'.png',save_fig=True,show_img=False)    
+    display_img(np.reshape(noisy_imgs_generated[0][0:784],(28,28)),y_label='epoch:'+str(epoch),title='epoch'+str(epoch)+'.png',save_fig=True,show_img=False)    
     send_msg_telegram(f'start of epoch: {epoch}....')
     send_image('./imgs/'+'epoch'+str(epoch)+'.png')
 
@@ -104,13 +104,8 @@ if __name__ == '__main__':
   send_msg_telegram(f"The numbers selected were {selected_numbers}")
   print(f"The numbers selected were {selected_numbers}")
   
-  #dataset = [img for index, img in enumerate(dataset) if target[index] in selected_numbers ]
-  #target = [number for number in target if number in selected_numbers ]
-  #print(dataset)
-  #target_one_hot_encodding = oneHotEncodding(target)
   dataset = np.array([np.reshape(img/255,(1,784)) for img in dataset])
   dataset = divide_dataset(dataset,target,selected_numbers)
-  #print(len(dataset),len(target))
   opt = parse_opt()
-  start_training(dataset,target,**vars(opt))
+  start_training(dataset,**vars(opt))
     

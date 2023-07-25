@@ -12,7 +12,7 @@ def generate_img(selected_numbers,mean,std,img_number,show_img):
     for index in range(img_number):
         
         target_one_hot_encoding = [0 for _ in range(10)]
-        random_number_index = random.randint(0,len(selected_numbers)-1)
+        #random_number_index = random.randint(0,len(selected_numbers)-1)
         if index < img_number/2:
             target_one_hot_encoding[selected_numbers[0]] = 1
         else:
