@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from telegram_bot.sender import send_msg_telegram
 import numpy as np
 
 def display_img(image,title='Image',x_label=None,y_label=None,show_axis=True,colorBar=False,size=(3,2),save_fig=False,path='./imgs',show_img=True):
@@ -64,7 +65,18 @@ def divide_dataset(dataset,target,selected_numbers):
   new_dataset = {}
   
   for index,selected_number in enumerate(selected_numbers):
-    
     new_dataset[index] = [ img for index_img,img in enumerate(dataset) if target[index_img] == selected_number]
   
   return new_dataset
+
+def print_dataset_according_to_keys(dataset,selected_numbers):
+ 
+  sum = 0 
+  
+  for index,key in enumerate(dataset.keys()):
+      
+    print(f"{key} => {selected_numbers[index]} => {len(dataset[key])}")
+    sum += len(dataset[key])
+    
+  print(f"Total dataset size is {sum}")
+  
