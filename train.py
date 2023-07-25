@@ -1,6 +1,6 @@
 import numpy as np
 from models import generator, discriminator
-from utils import generate_noisy_image, display_img, save_img, early_stopping, oneHotEncodding
+from utils import generate_noisy_image, display_img, save_img, early_stopping, oneHotEncodding, divide_dataset
 from tensorflow.keras.datasets import mnist
 import tensorflow as tf
 from path import paths
@@ -15,7 +15,7 @@ def start_training(x_train,target,epochs,learning_rate,tries):
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate), tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
-  smallest_lost, count, epoch_loss_all, dataset_size  = float('inf'), 0, [], len(target)
+  smallest_lost, count, epoch_loss_all = float('inf'), 0, []
 
   noisy_imgs_generated = np.reshape(generate_noisy_image(),(1,784))
   #noisy_imgs_generated[0][784+target[0]] = 1
@@ -28,8 +28,9 @@ def start_training(x_train,target,epochs,learning_rate,tries):
     send_image('./imgs/'+'epoch'+str(epoch)+'.png')
 
     generator_row, discriminator_row = [], []
+    dataset_to_train = x_train[0 if epoch%2 else 1]
 
-    for index_img,img in enumerate(x_train):
+    for index_img,img in enumerate(dataset_to_train):
       
         generator_loss_total, discriminator_loss_total = 0, 0
 
@@ -51,8 +52,8 @@ def start_training(x_train,target,epochs,learning_rate,tries):
 
         else:
           target_part = [0 for _ in range(10)]
-          noisy_img_794 = np.reshape(np.concatenate([noisy_imgs_generated[0], target_part], axis=0), (1,794)) # is it possible to optimize this line of code?
-          noisy_img_794[0][784+target[index_img]] = 1
+          noisy_img_794 = np.reshape(np.concatenate([noisy_imgs_generated[0], target_part], axis=0), (1,794)) 
+          noisy_img_794[0][784+selected_numbers[0 if epoch%2 else 1]] = 1
 
           with tf.GradientTape() as tape:
             
@@ -77,7 +78,7 @@ def start_training(x_train,target,epochs,learning_rate,tries):
     print(f"loss of epoch: {epoch_loss}. {feedback}")
     if keep_learning: break
 
-  x_train,target = shuffle(x_train,target)
+  x_train[0 if epoch%2 else 1] = shuffle(x_train[0 if epoch%2 else 1])
   model_generator.save(paths["model"]+"/generator.keras")
   send_msg_telegram("end of the traning")
   save_img(epoch_loss_all,title='loss_over_epoch',path=paths['imgs'])
@@ -100,17 +101,16 @@ if __name__ == '__main__':
   dataset, target = [*x_train,*x_test], [*y_train,*y_test]
   
   selected_numbers = [0,5]
-  
   send_msg_telegram(f"The numbers selected were {selected_numbers}")
   print(f"The numbers selected were {selected_numbers}")
   
-  dataset = [img for index, img in enumerate(dataset) if target[index] in selected_numbers ]
-  target = [number for number in target if number in selected_numbers ]
-  
-  target_one_hot_encodding = oneHotEncodding(target)
-  #dataset = np.array([ np.reshape([ *np.reshape(img/255,(1,784))[0],*target_one_hot_encodding[index] ],(1,794)) for index, img in enumerate(dataset)])
+  #dataset = [img for index, img in enumerate(dataset) if target[index] in selected_numbers ]
+  #target = [number for number in target if number in selected_numbers ]
+  #print(dataset)
+  #target_one_hot_encodding = oneHotEncodding(target)
   dataset = np.array([np.reshape(img/255,(1,784)) for img in dataset])
-  print(len(dataset),len(target))
+  dataset = divide_dataset(dataset,target,selected_numbers)
+  #print(len(dataset),len(target))
   opt = parse_opt()
   start_training(dataset,target,**vars(opt))
     

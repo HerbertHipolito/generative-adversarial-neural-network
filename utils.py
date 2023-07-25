@@ -58,3 +58,13 @@ def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
     feedback = f"No improviment found: {count}"
   
   return smallest_loss, count, True if count >= tries else False, feedback
+
+def divide_dataset(dataset,target,selected_numbers):
+  
+  new_dataset = {}
+  
+  for index,selected_number in enumerate(selected_numbers):
+    
+    new_dataset[index] = [ img for index_img,img in enumerate(dataset) if target[index_img] == selected_number]
+  
+  return new_dataset

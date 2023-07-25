@@ -7,17 +7,26 @@ import random
 
 def generate_img(selected_numbers,mean,std,img_number,show_img):
     
-    for index in range(img_number):
+    noisy_img = np.reshape(generate_noisy_image(mean,std),(1,784))
     
-        noisy_img = generate_noisy_image(mean,std)
-        noisy_img = np.reshape(noisy_img,(1,794))
+    for index in range(img_number):
+        
+        target_one_hot_encoding = [0 for _ in range(10)]
         random_number_index = random.randint(0,len(selected_numbers)-1)
-        noisy_img[0][784+selected_numbers[random_number_index]] = 1
-        generated_img = np.reshape(model(noisy_img)[0][0:784],(28,28))
+        if index < img_number/2:
+            target_one_hot_encoding[selected_numbers[0]] = 1
+        else:
+            target_one_hot_encoding[selected_numbers[1]] = 1
+        
+        noisy_img = np.reshape(np.concatenate([noisy_img[0],target_one_hot_encoding], axis=0),(1,794))
+        noisy_img = model(noisy_img)
+        
+        generated_img = np.reshape(noisy_img[0],(28,28))
+        
         display_img(generated_img,show_img=show_img,path = paths['generated_imgs'],save_fig=True,title="generated_"+str(index)+"_img.png")
+        #display_img(generated_img,show_img=show_img,path = paths['generated_imgs'],save_fig=True,title="generated_"+str(index)+"_img_"+str(selected_numbers[random_number_index])+"_.png")
         print(f"image {index+1} generated")
-        print(f"Number to be generated {selected_numbers[random_number_index]}")
-        noisy_img[0][784+selected_numbers[random_number_index]] = 0
+        #print(f"Number to be generated {selected_numbers[random_number_index]}")
          
 def parse_opt():
     
