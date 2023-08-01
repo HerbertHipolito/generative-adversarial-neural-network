@@ -91,7 +91,8 @@ def print_dataset_according_to_keys(dataset,selected_numbers):
 
 def generate_img(selected_numbers,mean,std,img_number,show_img):
   
-    model = keras.models.load_model(paths['model_generator']+'/'+'generator.keras')
+    model_generator = keras.models.load_model(paths['model_generator']+'/'+'generator.keras')
+    model_discriminator = keras.models.load_model(paths['model_discriminator']+'/'+'discriminator.keras')
     
     noisy_img = np.reshape(generate_noisy_image(mean,std),(1,784))
     portion_for_each_selected_number = img_number/len(selected_numbers)
@@ -101,7 +102,10 @@ def generate_img(selected_numbers,mean,std,img_number,show_img):
         target_one_hot_encoding = [selected_numbers[int(index/portion_for_each_selected_number)] for _ in range(10)]
         #target_one_hot_encoding[selected_numbers[int(index/portion_for_each_selected_number)]] = 1
         noisy_img = np.reshape(np.concatenate([noisy_img[0],target_one_hot_encoding], axis=0),(1,794))
-        noisy_img = model(noisy_img)
+        noisy_img = model_generator(noisy_img)
+        discriminator_result = model_discriminator(noisy_img)[0][0] 
+        print(f"discrminator result:\n prob: {discriminator_result}\n class: {'real' if discriminator_result > 0.5 else 'fake' }")
+        
         
         generated_img = np.reshape(noisy_img[0],(28,28))
         
@@ -109,10 +113,10 @@ def generate_img(selected_numbers,mean,std,img_number,show_img):
         print(f"image {index+1} generated")
         #print(f"Number to be generated {selected_numbers[random_number_index]}")
 
-def start_training(dataset,selected_numbers,epochs,learning_rate,tries):
+def start_training(dataset,selected_numbers,epochs,learning_rate_discriminator,learning_rate_generator,tries):
 
   model_generator, model_discriminator  = generator(), discriminator()
-  optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate), tf.keras.optimizers.Adam(learning_rate=learning_rate)
+  optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)
 
   smallest_lost, count, epoch_loss_all, amount_of_selected_numbers, acc_over_epochs = float('inf'), 0, [], len(dataset.keys()), []
 

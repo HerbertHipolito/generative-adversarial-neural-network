@@ -17,7 +17,7 @@ def parse_opt():
 if __name__ == "__main__":
 
     opt = parse_opt()
-    selected_numbers = [1,4,5,7]
+    selected_numbers = [1,4,7]
     print('Starting to generate images...')
     generate_img(selected_numbers, **vars(opt))
         
