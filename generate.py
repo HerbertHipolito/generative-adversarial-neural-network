@@ -1,33 +1,6 @@
-import keras
-from path import paths
-from utils import generate_noisy_image, display_img
-import numpy as np
 import argparse
-import random
+from utils import generate_img
 
-def generate_img(selected_numbers,mean,std,img_number,show_img):
-    
-    noisy_img = np.reshape(generate_noisy_image(mean,std),(1,784))
-    
-    for index in range(img_number):
-        
-        target_one_hot_encoding = [0 for _ in range(10)]
-        random_number_index = random.randint(0,len(selected_numbers)-1)
-        if index < img_number/2:
-            target_one_hot_encoding[selected_numbers[0]] = 1
-        else:
-            target_one_hot_encoding[selected_numbers[1]] = 1
-        
-        noisy_img = np.reshape(np.concatenate([noisy_img[0],target_one_hot_encoding], axis=0),(1,794))
-        noisy_img = model(noisy_img)
-        
-        generated_img = np.reshape(noisy_img[0],(28,28))
-        
-        display_img(generated_img,show_img=show_img,path = paths['generated_imgs'],save_fig=True,title="generated_"+str(index)+"_img.png")
-        #display_img(generated_img,show_img=show_img,path = paths['generated_imgs'],save_fig=True,title="generated_"+str(index)+"_img_"+str(selected_numbers[random_number_index])+"_.png")
-        print(f"image {index+1} generated")
-        #print(f"Number to be generated {selected_numbers[random_number_index]}")
-         
 def parse_opt():
     
     parser = argparse.ArgumentParser()
@@ -43,9 +16,8 @@ def parse_opt():
 
 if __name__ == "__main__":
 
-    model = keras.models.load_model(paths['model']+'/'+'generator.keras')
     opt = parse_opt()
-    selected_numbers = [0,5]
+    selected_numbers = [1,4,7]
     print('Starting to generate images...')
     generate_img(selected_numbers, **vars(opt))
         
