@@ -5,6 +5,7 @@ import argparse
 from telegram_bot.sender import send_msg_telegram
 from utils import start_training
 #https://www.tensorflow.org/guide/checkpoint?hl=pt-br
+#https://stackoverflow.com/questions/46974047/generative-adversarial-network-generating-image-with-some-random-pixels
 
 def parse_opt():
 
