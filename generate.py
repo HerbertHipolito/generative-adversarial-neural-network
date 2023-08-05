@@ -1,5 +1,5 @@
 import argparse
-from utils import generate_img
+from utils.GAN import generate_img
 
 def parse_opt():
     
