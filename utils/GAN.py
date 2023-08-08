@@ -1,4 +1,5 @@
 from telegram_bot.sender import send_msg_telegram
+import matplotlib.pyplot as plt
 import numpy as np
 from path import paths
 import keras
@@ -25,36 +26,42 @@ def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
   
   return smallest_loss, count, True if count >= tries else False, feedback
 
-def generate_img(selected_numbers,mean,std,img_number,show_img):
+def generate_img(selected_numbers,mean,std,img_number,show_img,show_discriminator_output):
   
     model_generator = keras.models.load_model(paths['model_generator']+'/'+'generator.keras')
     model_discriminator = keras.models.load_model(paths['model_discriminator']+'/'+'discriminator.keras')
-    
+    discriminator_plot = []
     noisy_img = np.reshape(generate_noisy_image(mean,std),(1,784))
     portion_for_each_selected_number = img_number/len(selected_numbers)
     
     for index in range(img_number):
       
         target_one_hot_encoding = [selected_numbers[int(index/portion_for_each_selected_number)] for _ in range(10)]
-        #target_one_hot_encoding[selected_numbers[int(index/portion_for_each_selected_number)]] = 1
         noisy_img = np.reshape(np.concatenate([noisy_img[0],target_one_hot_encoding], axis=0),(1,794))
         noisy_img = model_generator(noisy_img)
         discriminator_result = model_discriminator(noisy_img)[0][0] 
         print(f"discrminator result:\n prob: {discriminator_result}\n class: {'real' if discriminator_result > 0.5 else 'fake' }")
-        
         
         generated_img = np.reshape(noisy_img[0],(28,28))
         
         display_img(generated_img,show_img=show_img,path = paths['generated_imgs'],save_fig=True,title="generated_"+str(index)+"_img.png")
         print(f"image {index+1} generated")
         #print(f"Number to be generated {selected_numbers[random_number_index]}")
+        if  int(index/portion_for_each_selected_number) != int((index+1)/portion_for_each_selected_number):
+          noisy_img = np.reshape(generate_noisy_image(mean,std),(1,784))
+        discriminator_plot.append(discriminator_result) 
+        
 
-def start_training(dataset,selected_numbers,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information):
+    if show_discriminator_output:
+      plt.plot(discriminator_plot)
+      plt.show()
+    
+def start_training(dataset,selected_numbers,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)
 
-  smallest_lost, count, epoch_loss_all, amount_of_selected_numbers, acc_over_epochs = float('inf'), 0, [], len(dataset.keys()), []
+  smallest_lost, count, epoch_loss_all, acc_over_epochs = float('inf'), 0, [], []
 
   noisy_imgs_generated = np.reshape(generate_noisy_image(),(1,784))
   
@@ -69,9 +76,9 @@ def start_training(dataset,selected_numbers,epochs,learning_rate_discriminator,l
       send_image('./imgs/'+'epoch'+str(epoch)+'.png')
 
     generator_row, discriminator_row, prediction_discriminator_result_in_real,prediction_discriminator_result_in_generated = [], [], [], []
-    dataset_to_train = dataset[epoch%amount_of_selected_numbers]
+    #dataset_to_train = dataset[epoch%amount_of_selected_numbers]
 
-    for index_img in tqdm(range(len(dataset_to_train))):
+    for index_img in tqdm(range(len(dataset))):
       
         discriminator_loss, generator_loss_total  = 0, 0
 
@@ -79,7 +86,7 @@ def start_training(dataset,selected_numbers,epochs,learning_rate_discriminator,l
           
           with tf.GradientTape() as tape:
             
-            model_discriminator_result_real_img = model_discriminator(dataset_to_train[index_img], training=True)
+            model_discriminator_result_real_img = model_discriminator(dataset[index_img])
             
             prediction_discriminator_result_in_real.append( 1 if model_discriminator_result_real_img > 0.5 else 0) 
             
@@ -110,7 +117,7 @@ def start_training(dataset,selected_numbers,epochs,learning_rate_discriminator,l
         else:
           
           generator_loss_total = 0
-          target_part = [selected_numbers[epoch%amount_of_selected_numbers] for _ in range(10)]
+          target_part = [target[index_img] for _ in range(10)]
           noisy_img_794 = np.reshape(np.concatenate([noisy_imgs_generated[0], target_part], axis=0), (1,794)) 
           
           with tf.GradientTape() as tape:
@@ -147,7 +154,7 @@ def start_training(dataset,selected_numbers,epochs,learning_rate_discriminator,l
     assert not math.isnan(epoch_loss), "Nan  Found"
     
     if keep_learning: break
-    dataset[epoch%amount_of_selected_numbers] = shuffle(dataset[epoch%amount_of_selected_numbers])
+    dataset, target = shuffle(dataset,target)
    
   acc_over_epochs = np.array(acc_over_epochs)  
   
