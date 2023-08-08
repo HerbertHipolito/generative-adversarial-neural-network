@@ -35,9 +35,11 @@ if __name__ == '__main__':
     send_msg_telegram(f"The numbers selected were {selected_numbers}")
   #print(f"The numbers selected were {selected_numbers}")
   
-  dataset = np.array([np.reshape(img/255,(1,784)) for img in dataset])
-  dataset = divide_dataset(dataset,target,selected_numbers)
-  print_dataset_according_to_keys(dataset,selected_numbers)
+  dataset = np.array([np.reshape(img/255,(1,784)) for index, img in enumerate(dataset) if target[index] in selected_numbers])
+  target = [number for number in target if number in selected_numbers]
+  print(len(dataset),len(target))
+  #dataset = divide_dataset(dataset,target,selected_numbers)
+  #print_dataset_according_to_keys(dataset,selected_numbers)
   
-  start_training(dataset,selected_numbers,**parameters)
+  start_training(dataset,selected_numbers,target,**parameters)
     
