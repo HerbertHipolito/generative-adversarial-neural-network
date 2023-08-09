@@ -1,6 +1,4 @@
 import numpy as np
-from utils.plot_print import print_dataset_according_to_keys
-from utils.data import divide_dataset
 from tensorflow.keras.datasets import mnist
 import argparse
 from telegram_bot.sender import send_msg_telegram
@@ -33,13 +31,12 @@ if __name__ == '__main__':
   if parameters['telegram_information']: 
     send_msg_telegram("The model is going to be trained with the following parameters: "+str(vars(opt))) 
     send_msg_telegram(f"The numbers selected were {selected_numbers}")
-  #print(f"The numbers selected were {selected_numbers}")
+  
+  print(f"The numbers selected were {selected_numbers}")
   
   dataset = np.array([np.reshape(img/255,(1,784)) for index, img in enumerate(dataset) if target[index] in selected_numbers])
   target = [number for number in target if number in selected_numbers]
   print(len(dataset),len(target))
-  #dataset = divide_dataset(dataset,target,selected_numbers)
-  #print_dataset_according_to_keys(dataset,selected_numbers)
   
-  start_training(dataset,selected_numbers,target,**parameters)
+  start_training(dataset,target,**parameters)
     
