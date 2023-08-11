@@ -33,14 +33,17 @@ def generate_img(selected_numbers,mean,std,img_number,show_img,show_discriminato
     model_discriminator = keras.models.load_model(paths['model_discriminator']+'/'+'discriminator.keras')
     discriminator_plot = []
     noisy_img = tf.reshape(generate_noisy_image(mean,std),(1,784))
+    
     portion_for_each_selected_number = img_number/len(selected_numbers)
     
     for index in range(img_number):
-      
-        target_one_hot_encoding = [selected_numbers[int(index/portion_for_each_selected_number)] for _ in range(10)]
-        noisy_img = tf.reshape(tf.concat([noisy_img[0],target_one_hot_encoding], axis=0),(1,794))
-        noisy_img = model_generator(noisy_img)
-        discriminator_result = model_discriminator(noisy_img)[0][0] 
+        
+        current_number_representation = [selected_numbers[int(index/portion_for_each_selected_number)] for _ in range(10)]
+        
+        generator_input = tf.reshape(tf.concat([noisy_img[0],current_number_representation],axis=0),(1,794))
+        noisy_img = model_generator(generator_input)
+        generator_output_794 = tf.reshape(tf.concat([noisy_img[0],current_number_representation], axis=0),(1,794))
+        discriminator_result = model_discriminator(generator_output_794)[0][0] 
         print(f"discrminator result:\n prob: {discriminator_result}\n class: {'real' if discriminator_result > 0.5 else 'fake' }")
         
         generated_img = np.reshape(noisy_img[0],(28,28))
@@ -56,11 +59,14 @@ def generate_img(selected_numbers,mean,std,img_number,show_img,show_discriminato
       plt.plot(discriminator_plot)
       plt.show()
       
-def update_discriminator_weights(model,img,is_real_img,optimizer):
+def update_discriminator_weights(model,img,target,is_real_img,optimizer):
+  
+  target_array = [target for _ in range(10)]
+  input_model = tf.reshape(tf.concat([img[0],target_array],axis=0),(1,794))
   
   with tf.GradientTape() as tape:
     
-    model_result = model(img)
+    model_result = model(input_model)
     model_loss = (-1)*tf.math.log(model_result) if is_real_img else (-1)*tf.math.log(tf.math.subtract(1,model_result))
   
   grads_discriminator = tape.gradient(model_loss, model.trainable_weights)
@@ -76,7 +82,8 @@ def update_generator_weights(model_generator,model_discriminator,img,optimizer,t
   with tf.GradientTape() as tape:
     
     generator_model_result = model_generator(noisy_img_794)
-    discriminator_model_result = model_discriminator(generator_model_result)
+    noisy_img_794 = tf.reshape(tf.concat([generator_model_result[0],target_array], axis=0),(1,794))
+    discriminator_model_result = model_discriminator(noisy_img_794)
     model_loss = tf.math.log(tf.math.subtract(1,discriminator_model_result))
   
   grads_discriminator = tape.gradient(model_loss, model_generator.trainable_weights)
@@ -107,27 +114,27 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
 
     for index_img in tqdm(range(len(dataset))):
       
-        if not index_img%2:
-          
-          model_discriminator, discriminator_loss, model_output = update_discriminator_weights(model_discriminator,dataset[index_img],True,optimizer_discriminator)
-          
-          epoch_loss += discriminator_loss
-          discriminator_row.append(discriminator_loss)
-          prediction_discriminator_result_in_real.append(1 if model_output > 0.5 else 0 )
-          
-          model_discriminator, discriminator_loss, model_output = update_discriminator_weights(model_discriminator,noisy_imgs_generated,False,optimizer_discriminator)
-          
-          epoch_loss += discriminator_loss
-          discriminator_row.append(discriminator_loss)
-          prediction_discriminator_result_in_generated.append(1 if model_output > 0.5 else 0 )
-
-        else:
-           
-          model_generator, generator_loss, noisy_imgs_generated = update_generator_weights(model_generator,model_discriminator,noisy_imgs_generated,optimizer_generator,target[index_img])
-          
-          epoch_loss += generator_loss
-          generator_row.append(generator_loss)
-                      
+      #generator model training
+    
+      model_generator, generator_loss, noisy_imgs_generated = update_generator_weights(model_generator,model_discriminator,noisy_imgs_generated,optimizer_generator,target[index_img])
+      
+      epoch_loss += generator_loss
+      generator_row.append(generator_loss)
+      
+      #discriminator model training in real image
+      model_discriminator, discriminator_loss, model_output = update_discriminator_weights(model_discriminator,dataset[index_img],target[index_img],True,optimizer_discriminator)
+      
+      epoch_loss += discriminator_loss
+      discriminator_row.append(discriminator_loss)
+      prediction_discriminator_result_in_real.append(1 if model_output > 0.5 else 0 )
+      
+      #discriminator model training in fake image
+      model_discriminator, discriminator_loss, model_output = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target[index_img],False,optimizer_discriminator)
+      
+      epoch_loss += discriminator_loss
+      discriminator_row.append(discriminator_loss)
+      prediction_discriminator_result_in_generated.append(1 if model_output > 0.5 else 0 )
+                  
     save_img(generator_row,title='generator'+str(epoch),path=paths['generator_loss'],label='generator')
     save_img(discriminator_row,title='discriminator'+str(epoch),path=paths['discriminator_loss'],label='discriminator')
     
