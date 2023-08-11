@@ -1,4 +1,5 @@
 from telegram_bot.sender import send_msg_telegram
+import subprocess
 import matplotlib.pyplot as plt
 import numpy as np
 from path import paths
@@ -83,7 +84,7 @@ def update_generator_weights(model_generator,model_discriminator,img,optimizer,t
 
   return model_generator, model_loss.numpy()[0][0], generator_model_result
 
-def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information):
+def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,shut_down):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)
@@ -149,7 +150,8 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
     
     if math.isnan(epoch_loss):
       print("Nan  Found")
-      send_msg_telegram("Nan Found")
+      if telegram_information:
+        send_msg_telegram("Nan Found")
       break
     
     if keep_learning: break
@@ -159,7 +161,13 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
   
   model_generator.save(paths["model_generator"]+"/generator.keras")
   model_discriminator.save(paths["model_discriminator"]+"/discrminator.keras")
-  send_msg_telegram("end of the traning")
+  
+  if telegram_information: send_msg_telegram("end of the traning")
+  
   save_img(epoch_loss_all,title='loss_over_epoch',path=paths['imgs'])
   save_img(acc_over_epochs[:,0],title='accucary_over_epoch_in_real',path=paths['imgs'])
   save_img(acc_over_epochs[:,1],title='accucary_over_epoch_in_generated',path=paths['imgs'])
+  if shut_down:
+    if telegram_information: send_msg_telegram("shutting down your computer")
+    subprocess.Popen('shutdown -s -t 0', shell=True)
+  

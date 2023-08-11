@@ -16,6 +16,7 @@ def parse_opt():
   parser.add_argument('--learning_rate_discriminator',type=float,default=3e-5)
   parser.add_argument('--learning_rate_generator',type=float,default=3e-5)
   parser.add_argument('--telegram_information',type=bool,default=False)  
+  parser.add_argument('--shut_down',type=bool,default=False)  
   opt = parser.parse_args()
   print(vars(opt)) 
   return opt
