@@ -1,9 +1,5 @@
-from telegram_bot.sender import send_msg_telegram
-import subprocess
-import matplotlib.pyplot as plt
 import numpy as np
 from path import paths
-import keras
 from utils.models import generator, discriminator
 from sklearn.utils import shuffle
 from sklearn.metrics import accuracy_score
@@ -13,52 +9,20 @@ import tensorflow as tf
 from tqdm import tqdm
 from utils.data import generate_noisy_image
 from utils.plot_print import display_img, save_img
-
+ 
 def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
-  
-  feedback = ''
-  
-  if current_loss + e <= smallest_loss: 
-    count = 0
-    smallest_loss = current_loss
-  else:
-    count +=1
-    feedback = f"No improviment found: {count}"
-  
-  return smallest_loss, count, True if count >= tries else False, feedback
 
-def generate_img(selected_numbers,mean,std,img_number,show_img,show_discriminator_output):
-  
-    model_generator = keras.models.load_model(paths['model_generator']+'/'+'generator.keras')
-    model_discriminator = keras.models.load_model(paths['model_discriminator']+'/'+'discriminator.keras')
-    discriminator_plot = []
-    noisy_img = tf.reshape(generate_noisy_image(mean,std),(1,784))
-    
-    portion_for_each_selected_number = img_number/len(selected_numbers)
-    
-    for index in range(img_number):
-        
-        current_number_representation = [selected_numbers[int(index/portion_for_each_selected_number)] for _ in range(10)]
-        
-        generator_input = tf.reshape(tf.concat([noisy_img[0],current_number_representation],axis=0),(1,794))
-        noisy_img = model_generator(generator_input)
-        generator_output_794 = tf.reshape(tf.concat([noisy_img[0],current_number_representation], axis=0),(1,794))
-        discriminator_result = model_discriminator(generator_output_794)[0][0] 
-        print(f"discrminator result:\n prob: {discriminator_result}\n class: {'real' if discriminator_result > 0.5 else 'fake' }")
-        
-        generated_img = np.reshape(noisy_img[0],(28,28))
-        
-        display_img(generated_img,show_img=show_img,path = paths['generated_imgs'],save_fig=True,title="generated_"+str(index)+"_img.png")
-        print(f"image {index+1} generated")
-        
-        if  int(index/portion_for_each_selected_number) != int((index+1)/portion_for_each_selected_number):
-          noisy_img = np.reshape(generate_noisy_image(mean,std),(1,784))
-        discriminator_plot.append(discriminator_result) 
-        
-    if show_discriminator_output:
-      plt.plot(discriminator_plot)
-      plt.show()
-      
+    feedback = ''
+
+    if current_loss + e <= smallest_loss: 
+        count = 0
+        smallest_loss = current_loss
+    else:
+        count +=1
+        feedback = f"No improviment found: {count}"
+
+    return smallest_loss, count, True if count >= tries else False, feedback
+
 def update_discriminator_weights(model,img,target,is_real_img,optimizer):
   
   target_array = [target for _ in range(10)]
@@ -91,7 +55,7 @@ def update_generator_weights(model_generator,model_discriminator,img,optimizer,t
 
   return model_generator, model_loss.numpy()[0][0], generator_model_result
 
-def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,shut_down):
+def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)
@@ -174,7 +138,4 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
   save_img(epoch_loss_all,title='loss_over_epoch',path=paths['imgs'])
   save_img(acc_over_epochs[:,0],title='accucary_over_epoch_in_real',path=paths['imgs'])
   save_img(acc_over_epochs[:,1],title='accucary_over_epoch_in_generated',path=paths['imgs'])
-  if shut_down:
-    if telegram_information: send_msg_telegram("shutting down your computer")
-    subprocess.Popen('shutdown -s -t 0', shell=True)
   
