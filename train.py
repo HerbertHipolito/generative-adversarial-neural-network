@@ -2,11 +2,7 @@ import numpy as np
 from tensorflow.keras.datasets import mnist
 import argparse
 from telegram_bot.sender import send_msg_telegram
-from utils.GAN import start_training
-
-#https://www.tensorflow.org/guide/checkpoint?hl=pt-br
-#https://stackoverflow.com/questions/46974047/generative-adversarial-network-generating-image-with-some-random-pixels
-#https://arxiv.org/pdf/1511.06434v2.pdf
+from utils.training import start_training
 
 def parse_opt():
 
@@ -16,7 +12,6 @@ def parse_opt():
   parser.add_argument('--learning_rate_discriminator',type=float,default=3e-5)
   parser.add_argument('--learning_rate_generator',type=float,default=3e-5)
   parser.add_argument('--telegram_information',type=bool,default=False)  
-  parser.add_argument('--shut_down',type=bool,default=False)  
   opt = parser.parse_args()
   print(vars(opt)) 
   return opt
@@ -27,7 +22,7 @@ if __name__ == '__main__':
   (x_train, y_train), (x_test, y_test) = mnist.load_data()
   dataset, target = [*x_train,*x_test], [*y_train,*y_test]
   
-  selected_numbers, parameters = [1,4,7], vars(opt)
+  selected_numbers, parameters = [1,4], vars(opt)
   
   if parameters['telegram_information']: 
     send_msg_telegram("The model is going to be trained with the following parameters: "+str(vars(opt))) 
