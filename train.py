@@ -4,10 +4,6 @@ import argparse
 from telegram_bot.sender import send_msg_telegram
 from utils.training import start_training
 
-#https://www.tensorflow.org/guide/checkpoint?hl=pt-br
-#https://stackoverflow.com/questions/46974047/generative-adversarial-network-generating-image-with-some-random-pixels
-#https://arxiv.org/pdf/1511.06434v2.pdf
-
 def parse_opt():
 
   parser = argparse.ArgumentParser()
