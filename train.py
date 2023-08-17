@@ -9,6 +9,8 @@ def parse_opt():
   parser = argparse.ArgumentParser()
   parser.add_argument('--epochs',type=int,default=200)
   parser.add_argument('--tries',type=int,default=20)
+  parser.add_argument('--batch',type=int,default=1)
+  parser.add_argument('--num_processes',type=int,default=3)
   parser.add_argument('--learning_rate_discriminator',type=float,default=3e-5)
   parser.add_argument('--learning_rate_generator',type=float,default=3e-5)
   parser.add_argument('--telegram_information',type=bool,default=False)  
