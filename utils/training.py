@@ -64,7 +64,7 @@ def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,
   
   return model_generator, batch_loss.numpy(), generator_model_results
 
-def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,batch,num_processes):
+def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,batch):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)

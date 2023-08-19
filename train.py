@@ -10,7 +10,7 @@ def parse_opt():
   parser.add_argument('--epochs',type=int,default=200)
   parser.add_argument('--tries',type=int,default=20,help="Early Stopping parameter.\n The number of attempts that the model will keep training with no improvement")
   parser.add_argument('--batch',type=int,default=1,help="Mini-batch size")
-  parser.add_argument('--num_processes',type=int,default=3)
+  parser.add_argument('--selected_numbers',type=int,default=[i for i in range(10)],help="The numbers in the images to be generated. More number will make the training to take more time",nargs="+")
   parser.add_argument('--learning_rate_discriminator',type=float,default=3e-5)
   parser.add_argument('--learning_rate_generator',type=float,default=3e-5)
   parser.add_argument('--telegram_information',type=bool,default=False,help="Send information via the Telegram bot about the training process, including an image at the end of each epoch.\n It's needed to set the key and chat_id: Just go to telegram_bot => variables and replace them ")  
@@ -24,7 +24,8 @@ if __name__ == '__main__':
   (x_train, y_train), (x_test, y_test) = mnist.load_data()
   dataset, target = [*x_train,*x_test], [*y_train,*y_test]
   
-  selected_numbers, parameters = [1,4], vars(opt)
+  parameters =  vars(opt)
+  selected_numbers = parameters['selected_numbers']
   
   if parameters['telegram_information']: 
     send_msg_telegram("The model is going to be trained with the following parameters: "+str(vars(opt))) 
