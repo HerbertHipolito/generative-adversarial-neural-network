@@ -1,7 +1,8 @@
 path.py
 previous_results
 imgs
-telegram_bot
+telegram_bot/__pycache__
+telegram_bot/bot.py
 __pycache__
 generated_imgs
 generateIMG.ipynb
@@ -9,3 +10,8 @@ githubFolder
 utils/__pycache__
 ToDoList.txt
 shutdown.py
+.env
+model/generator/*
+model/generator/!generator.keras
+model/discriminator/*
+model/discriminator/!discriminator.keras
