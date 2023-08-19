@@ -34,3 +34,13 @@ def save_img(y,title=None,x_label='epoch',y_label='loss',path='./imgs',label=Non
   plt.savefig(path+'/'+title+'.png')
   plt.clf()
   plt.close()
+  
+def print_parameters(dict_parameters):
+  
+  message = '\n'
+  
+  for key in dict_parameters.keys():
+    
+    message += f"{key}: {dict_parameters[key]}\n"
+    
+  return message

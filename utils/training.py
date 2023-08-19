@@ -23,46 +23,55 @@ def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
 
     return smallest_loss, count, True if count >= tries else False, feedback
 
-def update_discriminator_weights(model,img,target,is_real_img,optimizer):
+def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch):  
   
-  target_array = [target for _ in range(10)]
-  input_model = tf.reshape(tf.concat([img[0],target_array],axis=0),(1,794))
+  target_arrays = [[target for _ in range(10)] for target in targets]
+  input_discriminator = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]],axis=0),(1,794)) for i in range(len(imgs))] 
+  model_results = []
   
   with tf.GradientTape() as tape:
     
-    model_result = model(input_model)
-    model_loss = (-1)*tf.math.log(model_result) if is_real_img else (-1)*tf.math.log(tf.math.subtract(1,model_result))
-  
+    for i in range(batch):
+      model_results.append(model(input_discriminator[i]))
+      
+    model_loss = tf.reduce_mean([(-1)*tf.math.log(model_result) if is_real_img else (-1)*tf.math.log(tf.math.subtract(1,model_result)) for model_result in model_results])
+    
   grads_discriminator = tape.gradient(model_loss, model.trainable_weights)
   optimizer.apply_gradients(zip(grads_discriminator, model.trainable_weights))
   
-  return model, model_loss.numpy()[0][0], model_result
+  return model, model_loss.numpy(), model_results
     
-def update_generator_weights(model_generator,model_discriminator,img,optimizer,target):
+def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,targets,batch): 
  
-  target_array = [target for _ in range(10)] 
-  noisy_img_794 = tf.reshape(tf.concat([img[0],target_array], axis=0),(1,794))
+  target_arrays = [[target for _ in range(10)] for target in targets]
+  noisy_imgs_794 = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]], axis=0),(1,794)) for i in range(len(imgs))]
+  
+  batch_loss, discriminator_model_results, generator_model_results = 0, [], []
 
   with tf.GradientTape() as tape:
     
-    generator_model_result = model_generator(noisy_img_794)
-    noisy_img_794 = tf.reshape(tf.concat([generator_model_result[0],target_array], axis=0),(1,794))
-    discriminator_model_result = model_discriminator(noisy_img_794)
-    model_loss = tf.math.log(tf.math.subtract(1,discriminator_model_result))
+    for i in range(batch):
+      
+      generator_model_result = model_generator(noisy_imgs_794[i])
+      generated_img_794 = tf.reshape(tf.concat([generator_model_result[0],target_arrays[i]], axis=0),(1,794))
+      discriminator_model_results.append(model_discriminator(generated_img_794))
+      generator_model_results.append(generator_model_result)
+      
+    batch_loss = tf.reduce_mean([tf.math.log(tf.math.subtract(1,discriminator_model_result)) for discriminator_model_result in discriminator_model_results])
   
-  grads_discriminator = tape.gradient(model_loss, model_generator.trainable_weights)
+  grads_discriminator = tape.gradient(batch_loss, model_generator.trainable_weights)
   optimizer.apply_gradients(zip(grads_discriminator, model_generator.trainable_weights))
+  
+  return model_generator, batch_loss.numpy(), generator_model_results
 
-  return model_generator, model_loss.numpy()[0][0], generator_model_result
-
-def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information):
+def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,batch):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)
 
-  smallest_lost, count, epoch_loss_all, acc_over_epochs = float('inf'), 0, [], []
+  smallest_lost, count, epoch_loss_all, acc_over_epochs, dataset_size = float('inf'), 0, [], [], len(dataset)
 
-  noisy_imgs_generated = tf.reshape(generate_noisy_image(),(1,784))
+  noisy_imgs_generated = [tf.reshape(generate_noisy_image(),(1,784)) for _ in range(batch)]
   
   for epoch in range(epochs):
     
@@ -76,29 +85,26 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
 
     generator_row, discriminator_row, prediction_discriminator_result_in_real,prediction_discriminator_result_in_generated = [], [], [], []
 
-    for index_img in tqdm(range(len(dataset))):
+    for index_img in tqdm(range(0,dataset_size-batch,batch)):
       
-      #generator model training
-    
-      model_generator, generator_loss, noisy_imgs_generated = update_generator_weights(model_generator,model_discriminator,noisy_imgs_generated,optimizer_generator,target[index_img])
+      real_img_batch, target_batch = dataset[index_img:index_img+batch], target[index_img:index_img+batch]
       
+      #generator model training      
+      model_generator, generator_loss, noisy_imgs_generated = update_generator_weights(model_generator,model_discriminator,noisy_imgs_generated,optimizer_generator,target_batch,batch)
       epoch_loss += generator_loss
-      generator_row.append(generator_loss)
+      generator_row.append(generator_loss) 
       
-      #discriminator model training in real image
-      model_discriminator, discriminator_loss, model_output = update_discriminator_weights(model_discriminator,dataset[index_img],target[index_img],True,optimizer_discriminator)
+      # discriminator model training
+      model_discriminator, discriminator_loss_real_img, model_output_real_img = update_discriminator_weights(model_discriminator,real_img_batch,target_batch,True,optimizer_discriminator,batch)
+      model_discriminator, discriminator_loss_noisy_img, model_output_noisy_img = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target_batch,False,optimizer_discriminator,batch)
       
-      epoch_loss += discriminator_loss
-      discriminator_row.append(discriminator_loss)
-      prediction_discriminator_result_in_real.append(1 if model_output > 0.5 else 0 )
+      epoch_loss += (discriminator_loss_noisy_img + discriminator_loss_real_img)
+      discriminator_row.append(discriminator_loss_noisy_img)
+      discriminator_row.append(discriminator_loss_real_img)
       
-      #discriminator model training in fake image
-      model_discriminator, discriminator_loss, model_output = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target[index_img],False,optimizer_discriminator)
-      
-      epoch_loss += discriminator_loss
-      discriminator_row.append(discriminator_loss)
-      prediction_discriminator_result_in_generated.append(1 if model_output > 0.5 else 0 )
-                  
+      prediction_discriminator_result_in_real = tf.concat([prediction_discriminator_result_in_real,[1 if output > 0.5 else 0 for output in model_output_real_img]],axis=0)
+      prediction_discriminator_result_in_generated = tf.concat([prediction_discriminator_result_in_generated,[1 if output > 0.5 else 0 for output in model_output_noisy_img]],axis=0)
+   
     save_img(generator_row,title='generator'+str(epoch),path=paths['generator_loss'],label='generator')
     save_img(discriminator_row,title='discriminator'+str(epoch),path=paths['discriminator_loss'],label='discriminator')
     
