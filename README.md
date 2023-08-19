@@ -62,12 +62,14 @@ options:
   --epochs EPOCHS
   --tries TRIES         Early Stopping parameter. The number of attempts that the model will keep training with no improvement
   --batch BATCH         Mini-batch size
-  --num_processes NUM_PROCESSES
+  --selected_numbers SELECTED_NUMBERS [SELECTED_NUMBERS ...]
+  The numbers in the images to be generated. More numbers will make the training take more time.
   --learning_rate_discriminator LEARNING_RATE_DISCRIMINATOR
   --learning_rate_generator LEARNING_RATE_GENERATOR
   --telegram_information TELEGRAM_INFORMATION
 
 ```
+You can select which number images the model will train on by setting up the parameter 'selected_number'. 
 
 If you wish to be notified via Telegram about the state of model training, you can use --telegram_information True and set your telegram_key and chat_id in the file telegram_bot/variables.py. afterward, at and of each epoch, you will receive information about the training process and a generated image.
 

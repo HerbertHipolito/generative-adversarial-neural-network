@@ -29,3 +29,9 @@ def oneHotEncodding(target):
     new_target.append(row)
 
   return new_target
+
+def is_valid_array(user_array):
+
+  return all(0 <= element <= 9 and isinstance(element, int) for element in user_array)
+
+      
