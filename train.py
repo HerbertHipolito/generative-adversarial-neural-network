@@ -8,12 +8,12 @@ def parse_opt():
 
   parser = argparse.ArgumentParser()
   parser.add_argument('--epochs',type=int,default=200)
-  parser.add_argument('--tries',type=int,default=20)
-  parser.add_argument('--batch',type=int,default=1)
+  parser.add_argument('--tries',type=int,default=20,help="Early Stopping parameter.\n The number of attempts that the model will keep training with no improvement")
+  parser.add_argument('--batch',type=int,default=1,help="Mini-batch size")
   parser.add_argument('--num_processes',type=int,default=3)
   parser.add_argument('--learning_rate_discriminator',type=float,default=3e-5)
   parser.add_argument('--learning_rate_generator',type=float,default=3e-5)
-  parser.add_argument('--telegram_information',type=bool,default=False)  
+  parser.add_argument('--telegram_information',type=bool,default=False,help="Send information via the Telegram bot about the training process, including an image at the end of each epoch.\n It's needed to set the key and chat_id: Just go to telegram_bot => variables and replace them ")  
   opt = parser.parse_args()
   print(vars(opt)) 
   return opt

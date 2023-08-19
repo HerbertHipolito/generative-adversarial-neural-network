@@ -23,7 +23,7 @@ def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
 
     return smallest_loss, count, True if count >= tries else False, feedback
 
-def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch):  # review this function and implement the multiprocessing
+def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch):  
   
   target_arrays = [[target for _ in range(10)] for target in targets]
   input_discriminator = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]],axis=0),(1,794)) for i in range(len(imgs))] 
@@ -41,7 +41,7 @@ def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch)
   
   return model, model_loss.numpy(), model_results
     
-def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,targets,batch): # review this function and implement the multiprocessing
+def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,targets,batch): 
  
   target_arrays = [[target for _ in range(10)] for target in targets]
   noisy_imgs_794 = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]], axis=0),(1,794)) for i in range(len(imgs))]
@@ -93,7 +93,8 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
       model_generator, generator_loss, noisy_imgs_generated = update_generator_weights(model_generator,model_discriminator,noisy_imgs_generated,optimizer_generator,target_batch,batch)
       epoch_loss += generator_loss
       generator_row.append(generator_loss) 
-
+      
+      # discriminator model training
       model_discriminator, discriminator_loss_real_img, model_output_real_img = update_discriminator_weights(model_discriminator,real_img_batch,target_batch,True,optimizer_discriminator,batch)
       model_discriminator, discriminator_loss_noisy_img, model_output_noisy_img = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target_batch,False,optimizer_discriminator,batch)
       
@@ -101,8 +102,6 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
       discriminator_row.append(discriminator_loss_noisy_img)
       discriminator_row.append(discriminator_loss_real_img)
       
-#      prediction_discriminator_result_in_real.append([1 if output > 0.5 else 0 for output in model_output_real_img])
-#      prediction_discriminator_result_in_generated.append([1 if output > 0.5 else 0 for output in model_output_noisy_img])
       prediction_discriminator_result_in_real = tf.concat([prediction_discriminator_result_in_real,[1 if output > 0.5 else 0 for output in model_output_real_img]],axis=0)
       prediction_discriminator_result_in_generated = tf.concat([prediction_discriminator_result_in_generated,[1 if output > 0.5 else 0 for output in model_output_noisy_img]],axis=0)
    
