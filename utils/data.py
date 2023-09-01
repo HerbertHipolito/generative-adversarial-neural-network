@@ -1,4 +1,6 @@
 import numpy as np
+import os
+from PIL import Image
 
 def divide_dataset(dataset,target,selected_numbers):
   
@@ -34,4 +36,24 @@ def is_valid_array(user_array):
 
   return all(0 <= element <= 9 and isinstance(element, int) for element in user_array)
 
+def create_frames(folder_path): 
+  
+  if not os.path.exists(folder_path): raise Exception(f'Path {folder_path} not exists')
+  if not os.path.isdir(folder_path): raise Exception(f'Path {folder_path} is not folder')
+   
+  subfolders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
+  
+  for index, subfolder in enumerate(subfolders):
+  
+    img_folder, frames = os.path.join(folder_path,subfolder), []
+
+    for img_name in os.listdir(img_folder):
       
+      img_path = os.path.join(img_folder,img_name)
+      frames.append(Image.open(img_path))
+
+    # Fix the error when a gif already exist!!!
+    
+    frames[0].save(os.path.join(img_folder,f'gif{index}.gif'), save_all=True, append_images=frames[1:], loop=0, duration=300) 
+    
+  return frames 
