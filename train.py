@@ -5,6 +5,7 @@ from telegram_bot.sender import send_msg_telegram
 from utils.training import start_training
 from utils.plot_print import print_parameters
 from utils.data import is_valid_array
+from utils.log import new_action
 
 def parse_opt():
 
@@ -28,7 +29,9 @@ if __name__ == '__main__':
   
   parameters =  vars(opt)
   
-  assert is_valid_array(parameters['selected_numbers']), "The select_numbers input passed is not valid. Check if all numbers are ranging from 0 to 9"
+  if not is_valid_array(parameters['selected_numbers']):
+    raise ValueError("The select_numbers input passed is not valid. Check if all numbers are ranging from 0 to 9")
+  
   selected_numbers = parameters['selected_numbers']
   
   if parameters['telegram_information']: 
@@ -42,6 +45,7 @@ if __name__ == '__main__':
   target = [number for number in target if number in selected_numbers]
   print(len(dataset),len(target))
  
+  new_action("TRAINING",parameters)
   del parameters["selected_numbers"]
   start_training(dataset,target,**parameters)
-    
+  new_action("action completed in")

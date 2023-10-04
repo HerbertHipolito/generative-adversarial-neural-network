@@ -7,7 +7,7 @@ import math
 from telegram_bot.sender import send_msg_telegram, send_image
 import tensorflow as tf
 from tqdm import tqdm
-from utils.data import generate_noisy_image
+from utils.data import generate_noisy_image,reshape_and_concat_794,calculate_batch_loss_generator, calculate_batch_loss_discriminator
 from utils.plot_print import display_img, save_img
  
 def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
@@ -26,7 +26,8 @@ def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
 def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch):  
   
   target_arrays = [[target for _ in range(10)] for target in targets]
-  input_discriminator = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]],axis=0),(1,794)) for i in range(len(imgs))] 
+  #input_discriminator = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]],axis=0),(1,794)) for i in range(len(imgs))] 
+  input_discriminator = [reshape_and_concat_794(imgs[i],target_arrays[i]) for i in range(len(imgs))] 
   model_results = []
   
   with tf.GradientTape() as tape:
@@ -34,7 +35,8 @@ def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch)
     for i in range(batch):
       model_results.append(model(input_discriminator[i]))
       
-    model_loss = tf.reduce_mean([(-1)*tf.math.log(model_result) if is_real_img else (-1)*tf.math.log(tf.math.subtract(1,model_result)) for model_result in model_results])
+   #model_loss = tf.reduce_mean([(-1)*tf.math.log(model_result) if is_real_img else (-1)*tf.math.log(tf.math.subtract(1,model_result)) for model_result in model_results])
+    model_loss = calculate_batch_loss_discriminator(model_results,is_real_img)
     
   grads_discriminator = tape.gradient(model_loss, model.trainable_weights)
   optimizer.apply_gradients(zip(grads_discriminator, model.trainable_weights))
@@ -44,7 +46,8 @@ def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch)
 def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,targets,batch): 
  
   target_arrays = [[target for _ in range(10)] for target in targets]
-  noisy_imgs_794 = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]], axis=0),(1,794)) for i in range(len(imgs))]
+  #noisy_imgs_794 = [tf.reshape(tf.concat([imgs[i][0],target_arrays[i]], axis=0),(1,794)) for i in range(len(imgs))]
+  noisy_imgs_794 = [reshape_and_concat_794(imgs[i],target_arrays[i]) for i in range(len(imgs))]
   
   batch_loss, discriminator_model_results, generator_model_results = 0, [], []
 
@@ -53,11 +56,13 @@ def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,
     for i in range(batch):
       
       generator_model_result = model_generator(noisy_imgs_794[i])
-      generated_img_794 = tf.reshape(tf.concat([generator_model_result[0],target_arrays[i]], axis=0),(1,794))
+      #generated_img_794 = tf.reshape(tf.concat([generator_model_result[0],target_arrays[i]], axis=0),(1,794))
+      generated_img_794 = reshape_and_concat_794(generator_model_result,target_arrays[i])
       discriminator_model_results.append(model_discriminator(generated_img_794))
       generator_model_results.append(generator_model_result)
       
-    batch_loss = tf.reduce_mean([tf.math.log(tf.math.subtract(1,discriminator_model_result)) for discriminator_model_result in discriminator_model_results])
+    #batch_loss = tf.reduce_mean([tf.math.log(tf.math.subtract(1,discriminator_model_result)) for discriminator_model_result in discriminator_model_results])
+    batch_loss = calculate_batch_loss_generator(discriminator_model_results)
   
   grads_discriminator = tape.gradient(batch_loss, model_generator.trainable_weights)
   optimizer.apply_gradients(zip(grads_discriminator, model_generator.trainable_weights))
