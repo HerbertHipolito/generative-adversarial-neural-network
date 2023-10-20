@@ -151,3 +151,38 @@ show_discriminator_output: False
 selected_numbers: [3, 5, 9]
 
 ---------action completed in 10:21:11---------
+
+---------TRAINING 10:51:47---------
+---------Parameters used---------
+epochs: 120
+tries: 120
+sleep_discriminator: 3
+batch: 1
+selected_numbers: [3, 5, 9]
+learning_rate_discriminator: 2e-05
+learning_rate_generator: 4e-05
+telegram_information: True
+
+---------TRAINING 11:11:23---------
+---------Parameters used---------
+epochs: 120
+tries: 20
+sleep_discriminator: -1
+sleep_discriminator_acc: 0
+batch: 1
+selected_numbers: [3, 5, 9]
+learning_rate_discriminator: 2e-05
+learning_rate_generator: 4e-05
+telegram_information: True
+
+---------TRAINING 11:12:55---------
+---------Parameters used---------
+epochs: 120
+tries: 20
+sleep_discriminator: -1
+sleep_discriminator_acc: 0.7
+batch: 1
+selected_numbers: [3, 5, 9]
+learning_rate_discriminator: 2e-05
+learning_rate_generator: 4e-05
+telegram_information: True
