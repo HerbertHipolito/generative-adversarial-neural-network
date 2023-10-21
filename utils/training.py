@@ -7,7 +7,7 @@ import math
 from telegram_bot.sender import send_msg_telegram, send_image
 import tensorflow as tf
 from tqdm import tqdm
-from utils.data import generate_noisy_image,reshape_and_concat_794,calculate_batch_loss_generator, calculate_batch_loss_discriminator
+from utils.data import generate_noisy_image,reshape_and_concat_794,calculate_batch_loss_generator, calculate_batch_loss_discriminator, reshape_and_concat_794_multi_imgs
 from utils.plot_print import display_img, save_img
  
 def early_stopping(current_loss, smallest_loss, count, tries = 10, e = 0.005):
@@ -33,6 +33,8 @@ def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch)
     
     for i in range(batch):
       model_results.append(model(input_discriminator[i]))
+    
+   #model_results = model(input_discriminator) test this line of code
       
     model_loss = calculate_batch_loss_discriminator(model_results,is_real_img)
     
@@ -49,6 +51,11 @@ def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,
   batch_loss, discriminator_model_results, generator_model_results = 0, [], []
 
   with tf.GradientTape() as tape:
+    
+    # test these lines of code below
+    #generator_model_results = model_generator(noisy_imgs_794)  
+    #generated_imgs_794 = reshape_and_concat_794_multi_imgs(generator_model_results,target_arrays)
+    #discriminator_model_results = model_discriminator(generated_imgs_794)
     
     for i in range(batch):
       
@@ -97,7 +104,7 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
       
       # discriminator model training
       
-      if sleep_discriminator == -1 and sleep_discriminator_acc >= (acc_of_epoch_1+acc_of_epoch_2)/2: 
+      if (sleep_discriminator == -1 and sleep_discriminator_acc >= (acc_of_epoch_1+acc_of_epoch_2)/2) or count_discriminator >= 20: 
         
         model_discriminator, discriminator_loss_real_img, model_output_real_img = update_discriminator_weights(model_discriminator,real_img_batch,target_batch,True,optimizer_discriminator,batch)
         model_discriminator, discriminator_loss_noisy_img, model_output_noisy_img = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target_batch,False,optimizer_discriminator,batch)
@@ -108,6 +115,8 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
         
         prediction_discriminator_result_in_real = tf.concat([prediction_discriminator_result_in_real,[1 if output > 0.5 else 0 for output in model_output_real_img]],axis=0)
         prediction_discriminator_result_in_generated = tf.concat([prediction_discriminator_result_in_generated,[1 if output > 0.5 else 0 for output in model_output_noisy_img]],axis=0)
+        
+        count_discriminator = 0
       
       elif count_discriminator >= sleep_discriminator and sleep_discriminator != -1:
         

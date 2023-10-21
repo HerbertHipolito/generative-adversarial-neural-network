@@ -59,6 +59,9 @@ def create_frames(folder_path):
     
   return frames 
 
+def reshape_and_concat_794_multi_imgs(imgs,target_array): #test this function
+  return [reshape_and_concat_794(imgs[i],target_array[i]) for i in range(len(imgs))] 
+
 @tf.function
 def reshape_and_concat_794(img,target_array):
   return tf.reshape(tf.concat([img[0],target_array],axis=0),(1,794))
