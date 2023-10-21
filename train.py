@@ -13,7 +13,6 @@ def parse_opt():
   parser.add_argument('--epochs',type=int,default=200)
   parser.add_argument('--tries',type=int,default=20,help="Early Stopping parameter.\n The number of attempts that the model will keep training with no improvement")
   parser.add_argument('--sleep_discriminator',type=int,default=0,help="Number of loops that Discriminator will not update the weights")
-  parser.add_argument('--sleep_discriminator_acc',type=float,default=0,help="Determine the average accuracy in real and fake images that the Discriminator needs to reach out to update the discriminator weights. Only used if 'sleep_discriminator is -1'.")
   parser.add_argument('--batch',type=int,default=1,help="Mini-batch size")
   parser.add_argument('--selected_numbers',type=int,default=[i for i in range(10)],help="The numbers in the images to be generated. More numbers will make the training take more time",nargs="+")
   parser.add_argument('--learning_rate_discriminator',type=float,default=3e-5)

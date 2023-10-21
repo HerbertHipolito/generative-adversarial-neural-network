@@ -71,7 +71,7 @@ def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,
   
   return model_generator, batch_loss.numpy(), generator_model_results
 
-def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,batch,sleep_discriminator,sleep_discriminator_acc):
+def start_training(dataset,target,epochs,learning_rate_discriminator,learning_rate_generator,tries,telegram_information,batch,sleep_discriminator):
 
   model_generator, model_discriminator  = generator(), discriminator()
   optimizer_generator, optimizer_discriminator  = tf.keras.optimizers.Adam(learning_rate=learning_rate_generator), tf.keras.optimizers.Adam(learning_rate=learning_rate_discriminator)
@@ -103,22 +103,7 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
       generator_row.append(generator_loss) 
       
       # discriminator model training
-      
-      if (sleep_discriminator == -1 and sleep_discriminator_acc >= (acc_of_epoch_1+acc_of_epoch_2)/2) or count_discriminator >= 20: 
-        
-        model_discriminator, discriminator_loss_real_img, model_output_real_img = update_discriminator_weights(model_discriminator,real_img_batch,target_batch,True,optimizer_discriminator,batch)
-        model_discriminator, discriminator_loss_noisy_img, model_output_noisy_img = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target_batch,False,optimizer_discriminator,batch)
-        
-        epoch_loss += (discriminator_loss_noisy_img + discriminator_loss_real_img)
-        discriminator_row.append(discriminator_loss_noisy_img)
-        discriminator_row.append(discriminator_loss_real_img)
-        
-        prediction_discriminator_result_in_real = tf.concat([prediction_discriminator_result_in_real,[1 if output > 0.5 else 0 for output in model_output_real_img]],axis=0)
-        prediction_discriminator_result_in_generated = tf.concat([prediction_discriminator_result_in_generated,[1 if output > 0.5 else 0 for output in model_output_noisy_img]],axis=0)
-        
-        count_discriminator = 0
-      
-      elif count_discriminator >= sleep_discriminator and sleep_discriminator != -1:
+      if count_discriminator >= sleep_discriminator:
         
         model_discriminator, discriminator_loss_real_img, model_output_real_img = update_discriminator_weights(model_discriminator,real_img_batch,target_batch,True,optimizer_discriminator,batch)
         model_discriminator, discriminator_loss_noisy_img, model_output_noisy_img = update_discriminator_weights(model_discriminator,noisy_imgs_generated,target_batch,False,optimizer_discriminator,batch)
@@ -137,7 +122,7 @@ def start_training(dataset,target,epochs,learning_rate_discriminator,learning_ra
     save_img(generator_row,title='generator'+str(epoch),path=paths['generator_loss'],label='generator')
     save_img(discriminator_row,title='discriminator'+str(epoch),path=paths['discriminator_loss'],label='discriminator')
     
-    if epoch%10 == 0 and epoch != 0: 
+    if epoch%5 == 0 and epoch != 0: 
       model_generator.save(paths["model_generator"]+f"/generator{epoch}.keras")
       model_discriminator.save(paths["model_discriminator"]+f"/discriminator{epoch}.keras")
     
