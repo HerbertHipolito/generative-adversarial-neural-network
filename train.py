@@ -1,4 +1,6 @@
 import numpy as np
+#import os
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 from tensorflow.keras.datasets import mnist
 import argparse
 from telegram_bot.sender import send_msg_telegram

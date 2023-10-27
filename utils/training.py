@@ -34,8 +34,6 @@ def update_discriminator_weights(model,imgs,targets,is_real_img,optimizer,batch)
     for i in range(batch):
       model_results.append(model(input_discriminator[i]))
     
-   #model_results = model(input_discriminator) test this line of code
-      
     model_loss = calculate_batch_loss_discriminator(model_results,is_real_img)
     
   grads_discriminator = tape.gradient(model_loss, model.trainable_weights)
@@ -51,11 +49,6 @@ def update_generator_weights(model_generator,model_discriminator,imgs,optimizer,
   batch_loss, discriminator_model_results, generator_model_results = 0, [], []
 
   with tf.GradientTape() as tape:
-    
-    # test these lines of code below
-    #generator_model_results = model_generator(noisy_imgs_794)  
-    #generated_imgs_794 = reshape_and_concat_794_multi_imgs(generator_model_results,target_arrays)
-    #discriminator_model_results = model_discriminator(generated_imgs_794)
     
     for i in range(batch):
       

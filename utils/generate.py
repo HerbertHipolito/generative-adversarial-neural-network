@@ -16,7 +16,7 @@ def generate_img(selected_numbers,mean,std,img_number,show_img,show_discriminato
     
     portion_for_each_selected_number = img_number/len(selected_numbers)
     
-    path_folder_img = os.path.join(paths['generated_imgs'],str(selected_numbers[0]))
+    path_folder_img, iteration_per_img = os.path.join(paths['generated_imgs'],str(selected_numbers[0])), 0
 
     for index in range(img_number):
         
