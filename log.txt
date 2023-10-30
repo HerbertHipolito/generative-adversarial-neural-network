@@ -367,3 +367,316 @@ show_discriminator_output: False
 selected_numbers: [3, 5, 9]
 
 ---------action completed in 19:25:23---------
+
+---------GENERATION 20:07:31---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------GENERATION 20:08:14---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 20:08:33---------
+
+---------GENERATION 20:10:46---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 20:11:08---------
+
+---------GENERATION 20:15:35---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 20:15:58---------
+
+---------GENERATION 20:19:27---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 20:19:47---------
+
+---------GENERATION 20:22:47---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 20:23:33---------
+
+---------GENERATION 04:06:10---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------GENERATION 04:06:58---------
+---------Parameters used---------
+mean: 0.5
+std: 0.3
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:07:40---------
+
+---------GENERATION 04:33:11---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:33:51---------
+
+---------GENERATION 04:41:07---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:41:53---------
+
+---------GENERATION 04:46:25---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:47:09---------
+
+---------GENERATION 04:48:30---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:49:08---------
+
+---------GENERATION 04:52:26---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:53:08---------
+
+---------GENERATION 04:53:56---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:54:34---------
+
+---------GENERATION 04:57:46---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 04:58:25---------
+
+---------GENERATION 04:59:43---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:00:21---------
+
+---------GENERATION 05:01:47---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:02:26---------
+
+---------GENERATION 05:03:19---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:03:59---------
+
+---------GENERATION 05:07:57---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:08:38---------
+
+---------GENERATION 05:09:27---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------GENERATION 05:11:30---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:12:12---------
+
+---------GENERATION 05:15:21---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:16:02---------
+
+---------GENERATION 05:21:50---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:22:32---------
+
+---------GENERATION 05:25:13---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 05:26:01---------
+
+---------GENERATION 09:50:25---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 09:51:05---------
+
+---------GENERATION 10:09:36---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 10:10:21---------
+
+---------GENERATION 14:55:34---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 14:56:15---------
+
+---------GENERATION 02:45:22---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 02:45:53---------
+
+---------GENERATION 02:49:34---------
+---------Parameters used---------
+mean: 0.5
+std: 0.5
+img_number: 5
+show_img: False
+show_discriminator_output: False
+selected_numbers: [3, 5, 9]
+
+---------action completed in 02:50:03---------

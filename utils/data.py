@@ -41,21 +41,23 @@ def create_frames(folder_path):
  
   if not os.path.exists(folder_path): raise Exception(f'Path {folder_path} not exists')
   if not os.path.isdir(folder_path): raise Exception(f'Path {folder_path} is not folder')
-   
-  subfolders = [f for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))]
+  
+  subfolders, frames = [os.path.join(folder_path,f) for f in os.listdir(folder_path) if os.path.isdir(os.path.join(folder_path, f))], []
   
   for index, subfolder in enumerate(subfolders):
   
-    img_folder, frames = os.path.join(folder_path,subfolder), []
-
-    for img_name in os.listdir(img_folder):
-      
-      img_path = os.path.join(img_folder,img_name)
-      frames.append(Image.open(img_path))
-
-    # Fix the error when a gif already exist!!!
+    subsubfolders = [os.path.join(subfolder,f) for f in os.listdir(subfolder) if os.path.isdir(os.path.join(subfolder, f))]
     
-    frames[0].save(os.path.join(img_folder,f'gif{index}.gif'), save_all=True, append_images=frames[1:], loop=0, duration=300) 
+    for index_2, subsubfolder in enumerate(subsubfolders):
+      
+      frames = []
+      for img_name in os.listdir(subsubfolder):
+        
+        img_path = os.path.join(subsubfolder,img_name)
+        frames.append(Image.open(img_path))
+      # Fix the error when a gif already exist!!!
+      
+      frames[0].save(os.path.join(subsubfolder,f'gif{index}_{index_2}.gif'), save_all=True, append_images=frames[1:], loop=0, duration=500) 
     
   return frames 
 
